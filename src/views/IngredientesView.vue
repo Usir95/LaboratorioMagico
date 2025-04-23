@@ -1,8 +1,8 @@
 <template>
   <ion-page>
     <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>🧂 Ingredientes</ion-title>
+      <ion-toolbar color="primary" class="ion-padding-top" style="padding-top: 3%;">
+        <ion-title class="ion-padding-top"> Ingredientes</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -19,6 +19,14 @@
             <h2>{{ item.nombre }}</h2>
             <p>{{ item.tipo }} | {{ item.rareza }}</p>
           </ion-label>
+          <template #end>
+            <ion-button fill="clear" size="small" color="warning" @click="editarIngrediente(item)">
+              ✏️
+            </ion-button>
+            <ion-button fill="clear" size="small" color="danger" @click="eliminarIngrediente(item.id)">
+              🗑️
+            </ion-button>
+          </template>
         </ion-item>
       </ion-list>
 
@@ -26,15 +34,16 @@
 
     </ion-content>
 
-    <ion-modal :is-open="showModal" @didDismiss="cerrarModal">
+    <ion-modal :is-open="showModal" @willDismiss="CerrarModal">
       <ion-header>
         <ion-toolbar>
           <ion-title>Nuevo Ingrediente</ion-title>
-          <template #end>
-            <ion-buttons>
-              <ion-button @click="cerrarModal">Cerrar</ion-button>
-            </ion-buttons>
-          </template>
+          <!-- eslint-disable vue/no-deprecated-slot-attribute -->
+          <ion-buttons slot="end">
+            <ion-button @click="CerrarModal">
+              Cerrar
+            </ion-button>
+          </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
@@ -65,59 +74,94 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getIngredientes, AddIngredientes } from '../database/Services/IngredientesService';
-import { IonPage, IonTitle, IonToolbar, IonHeader, IonButton, IonLabel, IonItem, IonList, IonContent, IonModal, IonSelect, IonInput, IonButtons, IonSelectOption } from '@ionic/vue';
+import {
+  getIngredientes,
+  AddIngredientes,
+  updateIngrediente,
+  deleteIngrediente
+} from '../database/Services/IngredientesService';
 
-const ingredientes = ref([])
+import {
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonHeader,
+  IonButton,
+  IonLabel,
+  IonItem,
+  IonList,
+  IonContent,
+  IonModal,
+  IonSelect,
+  IonInput,
+  IonButtons,
+  IonSelectOption
+} from '@ionic/vue';
 
-
-const cargarIngredientes = async () => {
-  ingredientes.value = await getIngredientes()
-}
-
-
+/* =================== Variables =================== */
+const ingredientes = ref([]);
 const showModal = ref(false);
-
 const form = ref({
+  id: null,
   nombre: '',
   tipo: '',
   rareza: ''
-})
+});
 
+/* =================== Ciclo de vida =================== */
+onMounted(() => {
+  CargarIngredientes();
+});
+
+/* =================== Funciones =================== */
+const CargarIngredientes = async () => {
+  ingredientes.value = await getIngredientes();
+};
 
 const abrirModal = () => {
-  showModal.value = true
-}
+  showModal.value = true;
+};
 
-
-const cerrarModal = () => {
-  showModal.value = false
+const CerrarModal = () => {
+  showModal.value = false;
   form.value = {
+    id: null,
     nombre: '',
     tipo: '',
     rareza: ''
-  }
-}
+  };
+};
 
+const agregarNuevo = () => {
+  abrirModal();
+};
+
+const editarIngrediente = (item) => {
+  form.value = { ...item };
+  showModal.value = true;
+};
 
 const GuardarIngrediente = async () => {
   if (!form.value.nombre || !form.value.tipo || !form.value.rareza) {
-    alert('Todos los campos son obligatorios')
-    return
+    alert('Todos los campos son obligatorios');
+    return;
   }
 
-  await AddIngredientes(form.value)
-  showModal.value = false;
-  form.value.reset();
-  await cargarIngredientes();
-}
+  if (form.value.id) {
+    await updateIngrediente(form.value);
+  } else {
+    await AddIngredientes(form.value);
+  }
 
+  await CargarIngredientes();
+  CerrarModal();
+};
 
-const agregarNuevo = () => {
-  abrirModal()
-}
+const eliminarIngrediente = async (id) => {
+  const confirmar = confirm('¿Estás seguro de que quieres eliminar este ingrediente?');
+  if (!confirmar) return;
 
-onMounted(() => {
-  cargarIngredientes()
-})
+  await deleteIngrediente(id);
+  await CargarIngredientes();
+};
 </script>

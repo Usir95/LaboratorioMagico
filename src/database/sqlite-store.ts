@@ -9,7 +9,9 @@ export const useDBStore = defineStore('database', () => {
   const initDB = async () => {
     if (db) return db;
 
-    if (Capacitor.getPlatform() === 'web') {
+    if (typeof window !== 'undefined' && Capacitor.getPlatform() == 'web') {
+      console.info('[SQLite] Usando jeep-sqlite en el navegador.');
+      
       const sqliteElement = document.querySelector('jeep-sqlite');
       if (!sqliteElement) {
         console.warn('[SQLite] El componente jeep-sqlite no está presente en el DOM.');

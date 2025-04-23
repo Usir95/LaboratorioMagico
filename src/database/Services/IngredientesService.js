@@ -16,3 +16,20 @@ export const AddIngredientes = async (ingrediente) => {
         [ingrediente.nombre, ingrediente.tipo, ingrediente.rareza, ingrediente.imagen || null]
     );
 };
+
+
+export const updateIngrediente = async (ingrediente) => {
+    const dbStore = useDBStore();
+    const db = await dbStore.initDB();
+
+    await db.run(`UPDATE ingredientes SET nombre = ?, tipo = ?, rareza = ?, imagen = ? WHERE id = ?`,
+        [ ingrediente.nombre, ingrediente.tipo, ingrediente.rareza, ingrediente.imagen || null, ingrediente.id]
+    );
+};
+
+export const deleteIngrediente = async (id) => {
+    const dbStore = useDBStore();
+    const db = await dbStore.initDB();
+
+    await db.run(`DELETE FROM ingredientes WHERE id = ?`, [id]);
+};
