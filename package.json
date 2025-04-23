@@ -1,5 +1,5 @@
 {
-  "name": "LaboratiorioMagico",
+  "name": "laboratiorio_magico",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -12,14 +12,22 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@capacitor-community/sqlite": "^7.0.0",
+    "@capacitor/android": "^7.2.0",
     "@capacitor/app": "7.0.1",
+    "@capacitor/camera": "^7.0.1",
     "@capacitor/core": "7.2.0",
+    "@capacitor/geolocation": "^7.1.1",
     "@capacitor/haptics": "7.0.1",
     "@capacitor/keyboard": "7.0.1",
+    "@capacitor/local-notifications": "^7.0.1",
     "@capacitor/status-bar": "7.0.1",
+    "@ionic/storage": "^4.0.0",
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
+    "cordova-sqlite-storage": "^7.0.0",
     "ionicons": "^7.0.0",
+    "pinia": "^3.0.2",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0"
   },
