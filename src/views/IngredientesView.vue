@@ -1,81 +1,109 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary" class="ion-padding-top" style="padding-top: 3%;">
-        <ion-title class="ion-padding-top"> Ingredientes</ion-title>
-      </ion-toolbar>
-    </ion-header>
 
-    <ion-content class="ion-padding">
-
-
-      <ion-button expand="block" @click="agregarNuevo">
-        Agregar Ingrediente
-      </ion-button>
-
-      <ion-list v-if="ingredientes.length">
-        <ion-item v-for="item in ingredientes" :key="item.id">
-          <ion-label>
-            <h2>{{ item.nombre }}</h2>
-            <p>{{ item.tipo }} | {{ item.rareza }}</p>
-          </ion-label>
-          <template #end>
-            <ion-button fill="clear" size="small" color="warning" @click="editarIngrediente(item)">
-              ✏️
-            </ion-button>
-            <ion-button fill="clear" size="small" color="danger" @click="eliminarIngrediente(item.id)">
-              🗑️
-            </ion-button>
-          </template>
-        </ion-item>
-      </ion-list>
-
-      <p v-else class="ion-text-center">Aún no hay ingredientes</p>
-
-    </ion-content>
-
-    <ion-modal :is-open="showModal" @willDismiss="CerrarModal">
       <ion-header>
-        <ion-toolbar>
-          <ion-title>Nuevo Ingrediente</ion-title>
-          <!-- eslint-disable vue/no-deprecated-slot-attribute -->
-          <ion-buttons slot="end">
-            <ion-button @click="CerrarModal">
-              Cerrar
-            </ion-button>
-          </ion-buttons>
+        <ion-toolbar color="secondary" class="!pt-6">
+            <ion-title class="text-white ion-text-uppercase text-xl"> Ingredientes</ion-title>
         </ion-toolbar>
       </ion-header>
+      <!-- =================== Contenido ===================  -->
+      <ion-content>
 
-      <ion-content class="ion-padding">
-        <ion-item>
-          <ion-input v-model="form.nombre" label="Nombre" label-placement="floating" fill="outline" placeholder="Ej: Mandrágora"></ion-input>
-        </ion-item>
+        <ion-grid style="background: #075985">
+          <ion-row>
+            <ion-button expand="full" shape="round" fill="solid"  @click="agregarNuevo" class="ion-margin-bottom ion w-full text-white mt-4">
+              <ion-icon  :ios="cubeOutline" :md="cubeOutline" class="mr-2"></ion-icon> Agregar Ingrediente
+            </ion-button>
+          </ion-row>
 
-        <ion-item>
-          <ion-input v-model="form.tipo" label="Tipo" label-placement="floating" fill="outline" placeholder="Ej: Raíz, Hoja, Cristal..."></ion-input>
-        </ion-item>
+          <ion-row>
+            <ion-list v-for="item in ingredientes" :key="item.id" style="background: #075985">
+              <ion-card>
+                <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+                <ion-card-header>
+                  <ion-card-title class="ion-text-center">
+                    <span class="text-sm text-gray-400">{{ item.tipo }} | {{ item.rareza }}</span>
+                  </ion-card-title>
+                  <ion-card-subtitle class="ion-text-center">
+                    <span class="text-base font-semibold text-sky-600">{{ item.nombre }}</span>
+                  </ion-card-subtitle>
+                </ion-card-header>
 
-        <ion-item>
-          <ion-select v-model="form.rareza" label="Rareza" label-placement="floating" fill="outline">
-            <ion-select-option value="común">Común</ion-select-option>
-            <ion-select-option value="rara">Rara</ion-select-option>
-            <ion-select-option value="legendaria">Legendaria</ion-select-option>
-          </ion-select>
-        </ion-item>
+                <ion-card-content>
+                  Lorem ipsum dolor sit.
+                </ion-card-content>
 
-        <ion-button expand="block" class="ion-margin-top" @click="GuardarIngrediente">
-          Guardar Ingrediente
-        </ion-button>
+                <ion-row class="bg-slate-300 ion-text-center w-full ion-no-padding">
+                  <ion-grid>
+                    <ion-row>
+                      <ion-col>
+                        <ion-button fill="clear" size="small" color="primary" @click="editarIngrediente(item)">
+                          <ion-icon :ios="createOutline" :md="createOutline"></ion-icon>
+                        </ion-button>
+                      </ion-col>
+
+                      <ion-col>
+                        <ion-button fill="clear" size="small" color="danger" @click="eliminarIngrediente(item.id)">
+                          <ion-icon :ios="trashOutline" :md="trashOutline"></ion-icon>
+                        </ion-button>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </ion-row>
+              </ion-card>
+            </ion-list>
+          </ion-row>
+
+        </ion-grid>
+
       </ion-content>
-    </ion-modal>
+
+      <!-- ================= Modal =================  -->
+      <ion-modal :is-open="showModal" @willDismiss="CerrarModal" :initial-breakpoint="0.75" :breakpoints="[0, 0.5, 0.75]" :backdrop-dismiss="true">
+        
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Nuevo Ingrediente</ion-title>
+            <!-- eslint-disable vue/no-deprecated-slot-attribute -->
+            <ion-buttons slot="end">
+              <ion-button @click="CerrarModal">
+                Cerrar
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding" style="margin-bottom: 5px;">
+          <ion-item class="mb-4">
+            <ion-input v-model="form.nombre" label="Nombre" label-placement="floating" fill="outline" placeholder="Ej: Mandrágora" class="rounded-lg"></ion-input>
+          </ion-item>
+
+          <ion-item class="mb-4">
+            <ion-input v-model="form.tipo" label="Tipo" label-placement="floating" fill="outline" placeholder="Ej: Raíz, Hoja, Cristal..." class="rounded-lg"></ion-input>
+          </ion-item>
+
+          <ion-item class="mb-6">
+            <ion-select v-model="form.rareza" label="Rareza" label-placement="floating" fill="outline" class="rounded-lg w-full">
+              <ion-select-option value="común">Común</ion-select-option>
+              <ion-select-option value="rara">Rara</ion-select-option>
+              <ion-select-option value="legendaria">Legendaria</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-button expand="block" class="ion-margin-top rounded-lg" @click="GuardarIngrediente" color="primary">
+            Guardar Ingrediente
+          </ion-button>
+        </ion-content>
+      </ion-modal>
+
   </ion-page>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { cubeOutline, createOutline, trashOutline, } from 'ionicons/icons';
 import {
-  getIngredientes,
+  GetIngredientes,
   AddIngredientes,
   updateIngrediente,
   deleteIngrediente
@@ -85,9 +113,9 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  IonIcon,
   IonHeader,
   IonButton,
-  IonLabel,
   IonItem,
   IonList,
   IonContent,
@@ -95,7 +123,9 @@ import {
   IonSelect,
   IonInput,
   IonButtons,
-  IonSelectOption
+  IonSelectOption,
+  IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle,
+  IonGrid, IonRow, IonCol,
 } from '@ionic/vue';
 
 /* =================== Variables =================== */
@@ -115,7 +145,7 @@ onMounted(() => {
 
 /* =================== Funciones =================== */
 const CargarIngredientes = async () => {
-  ingredientes.value = await getIngredientes();
+  ingredientes.value = await GetIngredientes();
 };
 
 const abrirModal = () => {
