@@ -55,7 +55,7 @@
           </ion-select>
         </ion-item>
 
-        <ion-button expand="block" class="ion-margin-top" @click="guardarIngrediente">
+        <ion-button expand="block" class="ion-margin-top" @click="GuardarIngrediente">
           Guardar Ingrediente
         </ion-button>
       </ion-content>
@@ -64,8 +64,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getIngredientes, addIngrediente } from '../database/Services/IngredientesService'
+import { ref, onMounted } from 'vue';
+import { getIngredientes, AddIngredientes } from '../database/Services/IngredientesService';
 import { IonPage, IonTitle, IonToolbar, IonHeader, IonButton, IonLabel, IonItem, IonList, IonContent, IonModal, IonSelect, IonInput, IonButtons, IonSelectOption } from '@ionic/vue';
 
 const ingredientes = ref([])
@@ -100,15 +100,16 @@ const cerrarModal = () => {
 }
 
 
-const guardarIngrediente = async () => {
+const GuardarIngrediente = async () => {
   if (!form.value.nombre || !form.value.tipo || !form.value.rareza) {
     alert('Todos los campos son obligatorios')
     return
   }
 
-  await addIngrediente(form.value)
-  cerrarModal()                    
-  await cargarIngredientes()
+  await AddIngredientes(form.value)
+  showModal.value = false;
+  form.value.reset();
+  await cargarIngredientes();
 }
 
 

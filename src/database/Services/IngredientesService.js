@@ -7,7 +7,7 @@ export const getIngredientes = async () => {
     return res.values || [];
 };
 
-export const addIngrediente = async (ingrediente) => {
+export const AddIngredientes = async (ingrediente) => {
     const dbStore = useDBStore();
     const db = await dbStore.initDB();
 
