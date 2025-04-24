@@ -7,7 +7,7 @@
         </ion-toolbar>
       </ion-header>
       <!-- =================== Contenido ===================  -->
-      <ion-content style="background: #075985">
+      <ion-content :style="{'--background': '#075985'}">
 
         <ion-grid style="background: #075985">
           <ion-row>
@@ -17,49 +17,54 @@
           </ion-row>
 
           <ion-row>
-            <ion-list v-for="item in ingredientes" :key="item.id" style="background: #075985">
-              <ion-card>
-                <img
-                  :src="imagenMap[item.id] || 'https://ionicframework.com/docs/img/demos/card-media.png'"
-                  alt="Imagen del ingrediente"
-                  class="object-cover w-full h-48 rounded-t-lg"
-                />
+            <Swiper
+              :slides-per-view="1.2"
+              space-between="20"
+              class="w-full px-4"
+            >
+              <SwiperSlide
+                v-for="item in ingredientes"
+                :key="item.id"
+              >
+                <ion-card class="h-[22rem] flex flex-col justify-between">
+                  <img
+                    :src="imagenMap[item.id] || 'https://ionicframework.com/docs/img/demos/card-media.png'"
+                    alt="Imagen del ingrediente"
+                    class="object-cover w-full h-48 rounded-t-lg"
+                  />
 
-                <ion-card-header class="h-24">
+                  <ion-card-header class="flex flex-col items-center justify-center px-4 py-2 text-center">
+                    <ion-card-title>
+                      <span class="text-sm text-gray-400">{{ item.tipo }} | {{ item.rareza }}</span>
+                    </ion-card-title>
+                    <ion-card-subtitle>
+                      <span class="text-base font-semibold text-sky-600">{{ item.nombre }}</span>
+                    </ion-card-subtitle>
+                  </ion-card-header>
 
-                  <ion-card-title class="ion-text-center">
-                    <span class="text-sm text-gray-400">{{ item.tipo }} | {{ item.rareza }}</span>
-                  </ion-card-title>
+                  <ion-card-content class="flex-1 px-4 text-sm text-center text-gray-200">
+                    {{ item.descripcion || 'Sin descripción' }}
+                  </ion-card-content>
 
-                  <ion-card-subtitle class="ion-text-center">
-                    <span class="text-base font-semibold text-sky-600">{{ item.nombre }}</span>
-                  </ion-card-subtitle>
-                  
-                </ion-card-header>
-
-                <ion-card-content class="text-sm text-gray-200 ion-text-center">
-                  {{ item.descripcion || 'Sin descripción' }}
-                </ion-card-content>
-
-                <ion-row class="w-full bg-slate-300 ion-text-center ion-no-padding">
-                  <ion-grid>
-                    <ion-row>
-                      <ion-col>
-                        <ion-button fill="clear" size="small" color="primary" @click="editarIngrediente(item)">
-                          <ion-icon :ios="createOutline" :md="createOutline"></ion-icon>
-                        </ion-button>
-                      </ion-col>
-
-                      <ion-col>
-                        <ion-button fill="clear" size="small" color="danger" @click="eliminarIngrediente(item.id)">
-                          <ion-icon :ios="trashOutline" :md="trashOutline"></ion-icon>
-                        </ion-button>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
-                </ion-row>
-              </ion-card>
-            </ion-list>
+                  <ion-row class="w-full bg-slate-300 ion-text-center ion-no-padding">
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col>
+                          <ion-button fill="clear" size="small" color="primary" @click="editarIngrediente(item)">
+                            <ion-icon :icon="createOutline"></ion-icon>
+                          </ion-button>
+                        </ion-col>
+                        <ion-col>
+                          <ion-button fill="clear" size="small" color="danger" @click="eliminarIngrediente(item.id)">
+                            <ion-icon :icon="trashOutline"></ion-icon>
+                          </ion-button>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+                  </ion-row>
+                </ion-card>
+              </SwiperSlide>
+            </Swiper>
           </ion-row>
 
         </ion-grid>
@@ -141,6 +146,9 @@
 import { ref, onMounted } from 'vue';
 import { cubeOutline, createOutline, trashOutline, saveOutline } from 'ionicons/icons';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import 'swiper/css'
+
 import {
   GetIngredientes,
   AddIngredientes,
@@ -155,8 +163,6 @@ import {
   IonIcon,
   IonHeader,
   IonButton,
-  IonItem,
-  IonList,
   IonContent,
   IonModal,
   IonSelect,
