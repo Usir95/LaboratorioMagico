@@ -34,6 +34,7 @@ export const useDBStore = defineStore('database', () => {
         nombre TEXT NOT NULL,
         tipo TEXT NOT NULL,
         rareza TEXT NOT NULL,
+        descripcion TEXT,
         imagen TEXT
       )
     `);

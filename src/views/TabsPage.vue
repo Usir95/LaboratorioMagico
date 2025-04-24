@@ -3,6 +3,7 @@
     <ion-grid>
       <ion-tabs>
         <ion-router-outlet></ion-router-outlet>
+        <!-- eslint-disable vue/no-deprecated-slot-attribute -->
         <ion-tab-bar slot="bottom">
 
           <ion-tab-button tab="ingredientes" href="/tabs/ingredientes">
