@@ -7,42 +7,90 @@
         </ion-toolbar>
       </ion-header>
       <!-- =================== Contenido ===================  -->
-      <ion-content :style="{'--background': '#075985'}">
+      <ion-content :class="'bg-[#075985] dark:bg-[#0f172a]'">
+
 
         <ion-grid style="background: #075985">
-          <ion-row>
+          <!-- Añadir -->
+          <ion-row class="h-[10vh]">
             <ion-button expand="full" shape="round" fill="solid"  @click="agregarNuevo" class="w-full mt-4 text-white ion-margin-bottom ion">
               <ion-icon  :ios="cubeOutline" :md="cubeOutline" class="mr-2"></ion-icon> Agregar Ingrediente
             </ion-button>
           </ion-row>
 
-          <ion-row>
+          <ion-row class="h-[10vh] flex flex-col justify-center items-center space-y-1">
+  
+            <!-- Total de ingredientes -->
+            <ion-col class="text-center text-white font-bold text-sm w-full">
+              Total: {{ totalIngredientes }} ingrediente{{ totalIngredientes === 1 ? '' : 's' }}
+            </ion-col>
+
+            <!-- Input de búsqueda -->
+            <ion-col class="w-full mx-4">
+              <ion-input
+                v-model="busqueda"
+                label="Buscar"
+                label-placement="floating"
+                fill="solid"
+                placeholder="Buscar ingrediente..."
+                class="rounded-lg"
+              ></ion-input>
+            </ion-col>
+
+          </ion-row>
+
+          <!-- Lista de ingredientes -->
+          <div class="flex items-center justify-center mt-10">
             <Swiper
-              :slides-per-view="1.2"
-              space-between="20"
-              class="w-full px-4"
-            >
-              <SwiperSlide
-                v-for="item in ingredientes"
+            :modules="[EffectCoverflow, Pagination]"
+            effect="coverflow"
+            :grabCursor="true"
+            :centeredSlides="true"
+            :slidesPerView="1.2"
+            :loop="true"
+            :coverflowEffect="{
+              rotate: 30,
+              stretch: 0,
+              depth: 100,
+              modifier: 1,
+              slideShadows: true
+            }"
+
+            class="w-full"
+          >
+              <SwiperSlide v-for="item in ingredientesFiltrados" 
                 :key="item.id"
+                :class="[
+                  'transition duration-700 ease-in-out',
+                  item.id === ultimoAgregadoId ? 'animate-pulse ring-4 ring-yellow-400' : ''
+                ]"
               >
-                <ion-card class="h-[22rem] flex flex-col justify-between">
+
+              <ion-card
+                :class="[
+                  'h-[26rem] flex flex-col justify-between',
+                  'bg-white dark:bg-slate-800',
+                  item.rareza == 1 ? 'border-4 border-green-400' : '',
+                  item.rareza == 2 ? 'border-4 border-blue-400' : '',
+                  item.rareza == 3 ? 'border-4 border-purple-500' : '',
+                ]"
+              >
                   <img
                     :src="imagenMap[item.id] || 'https://ionicframework.com/docs/img/demos/card-media.png'"
                     alt="Imagen del ingrediente"
-                    class="object-cover w-full h-48 rounded-t-lg"
+                    class="object-cover w-full h-56 rounded-t-lg"
                   />
 
                   <ion-card-header class="flex flex-col items-center justify-center px-4 py-2 text-center">
                     <ion-card-title>
-                      <span class="text-sm text-gray-400">{{ item.tipo }} | {{ item.rareza }}</span>
+                      <span class="text-sm text-gray-700 dark:text-gray-300">{{ item.tipo }} | {{ item.rareza }}</span>
                     </ion-card-title>
                     <ion-card-subtitle>
-                      <span class="text-base font-semibold text-sky-600">{{ item.nombre }}</span>
+                      <span class="text-base font-semibold text-sky-600 dark:text-sky-400">{{ item.nombre }}</span>
                     </ion-card-subtitle>
                   </ion-card-header>
 
-                  <ion-card-content class="flex-1 px-4 text-sm text-center text-gray-200">
+                  <ion-card-content class="flex-1 px-4 text-sm text-center text-gray-500 dark:text-gray-300">
                     {{ item.descripcion || 'Sin descripción' }}
                   </ion-card-content>
 
@@ -50,7 +98,7 @@
                     <ion-grid>
                       <ion-row>
                         <ion-col>
-                          <ion-button fill="clear" size="small" color="primary" @click="editarIngrediente(item)">
+                          <ion-button fill="clear" size="small" color="primary" @click="EditarIngrediente(item)">
                             <ion-icon :icon="createOutline"></ion-icon>
                           </ion-button>
                         </ion-col>
@@ -63,9 +111,11 @@
                     </ion-grid>
                   </ion-row>
                 </ion-card>
+                
               </SwiperSlide>
             </Swiper>
-          </ion-row>
+          </div>
+
 
         </ion-grid>
 
@@ -143,17 +193,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed  } from 'vue';
 import { cubeOutline, createOutline, trashOutline, saveOutline } from 'ionicons/icons';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import 'swiper/css'
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
+import { EffectCoverflow, Pagination } from 'swiper/modules';
 
 import {
-  GetIngredientes,
-  AddIngredientes,
-  updateIngrediente,
-  deleteIngrediente
+  ObtenerIngredientes,
+  InsertarIngredientes,
+  ActualizarIngredientes,
+  EliminarIngrediente
 } from '../database/Services/IngredientesService';
 
 import {
@@ -179,6 +232,9 @@ const ingredientes = ref([]);
 const showModal = ref(false);
 const preview = ref(null);
 const imagenMap = ref({});
+const ultimoAgregadoId = ref(null);
+const busqueda = ref('');
+
 const form = ref({
   id: null,
   nombre: '',
@@ -195,8 +251,8 @@ onMounted(() => {
 
 /* =================== Funciones =================== */
 const CargarIngredientes = async () => {
-  ingredientes.value = await GetIngredientes();
-  await cargarImagenes();
+  ingredientes.value = await ObtenerIngredientes();
+  await CargarImagenes();
 };
 
 const abrirModal = () => {
@@ -216,7 +272,7 @@ const CerrarModal = () => {
   };
 };
 
-const cargarImagenes = async () => {
+const CargarImagenes = async () => {
   const map = {};
   for (const item of ingredientes.value) {
     if (item.imagen) {
@@ -261,7 +317,7 @@ const agregarNuevo = () => {
   abrirModal();
 };
 
-const editarIngrediente = (item) => {
+const EditarIngrediente = (item) => {
   form.value = { 
     id: item.id,
     nombre: item.nombre,
@@ -281,9 +337,14 @@ const GuardarIngrediente = async () => {
   }
 
   if (form.value.id) {
-    await updateIngrediente(form.value);
+    await ActualizarIngredientes(form.value);
+    ultimoAgregadoId.value = form.value.id;
   } else {
-    await AddIngredientes(form.value);
+    const insertedId = await InsertarIngredientes(form.value);
+    ultimoAgregadoId.value = insertedId;
+    setTimeout(() => {
+      ultimoAgregadoId.value = null;
+    }, 2000);
   }
 
   await CargarIngredientes();
@@ -294,9 +355,20 @@ const eliminarIngrediente = async (id) => {
   const confirmar = confirm('¿Estás seguro de que quieres eliminar este ingrediente?');
   if (!confirmar) return;
 
-  await deleteIngrediente(id);
+  await EliminarIngrediente(id);
   await CargarIngredientes();
 };
+
+/* =================== Computed =================== */
+const ingredientesFiltrados = computed(() => {
+  if (!busqueda.value) return ingredientes.value;
+  return ingredientes.value.filter(item =>
+    item.nombre.toLowerCase().includes(busqueda.value.toLowerCase())
+  );
+});
+
+const totalIngredientes = computed(() => ingredientesFiltrados.value.length);
+
 </script>
 
 <style scoped>
@@ -304,4 +376,4 @@ const eliminarIngrediente = async (id) => {
   height: 60vh;
   overflow-y: auto;
 }
-</style>le
+</style>
