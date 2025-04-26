@@ -7,18 +7,17 @@
         </ion-toolbar>
       </ion-header>
       <!-- =================== Contenido ===================  -->
-      <ion-content :class="'bg-[#075985] dark:bg-[#0f172a]'">
+      <ion-content>
 
-
-        <ion-grid style="background: #075985">
+        <ion-grid :class="'bg-[#075985] dark:bg-[#0f172a] h-[85vh]'">
           <!-- Añadir -->
-          <ion-row class="h-[10vh]">
+          <ion-row >
             <ion-button expand="full" shape="round" fill="solid"  @click="agregarNuevo" class="w-full mt-4 text-white ion-margin-bottom ion">
               <ion-icon  :ios="cubeOutline" :md="cubeOutline" class="mr-2"></ion-icon> Agregar Ingrediente
             </ion-button>
           </ion-row>
 
-          <ion-row class="h-[10vh] flex flex-col justify-center items-center space-y-1">
+          <ion-row class="flex flex-col justify-center items-center space-y-6 mx-4">
   
             <!-- Total de ingredientes -->
             <ion-col class="text-center text-white font-bold text-sm w-full">
@@ -26,21 +25,19 @@
             </ion-col>
 
             <!-- Input de búsqueda -->
-            <ion-col class="w-full mx-4">
+            <ion-col >
               <ion-input
                 v-model="busqueda"
-                label="Buscar"
-                label-placement="floating"
-                fill="solid"
+                fill="outline"
                 placeholder="Buscar ingrediente..."
-                class="rounded-lg"
+                class="rounded-xl border-2 border-sky-600 py-1"
               ></ion-input>
             </ion-col>
 
           </ion-row>
 
           <!-- Lista de ingredientes -->
-          <div class="flex items-center justify-center mt-10">
+          <div class="flex items-center justify-center mt-16">
             <Swiper
             :modules="[EffectCoverflow, Pagination]"
             effect="coverflow"
@@ -115,7 +112,6 @@
               </SwiperSlide>
             </Swiper>
           </div>
-
 
         </ion-grid>
 
