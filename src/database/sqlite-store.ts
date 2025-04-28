@@ -9,7 +9,7 @@ export const useDBStore = defineStore('database', () => {
   const initDB = async () => {
     if (db) return db;
 
-    if (typeof window !== 'undefined' && Capacitor.getPlatform() == 'web') {
+    if (typeof window != 'undefined' && Capacitor.getPlatform() == 'web') {
       console.info('[SQLite] Usando jeep-sqlite en el navegador.');
       
       const sqliteElement = document.querySelector('jeep-sqlite');
@@ -28,16 +28,27 @@ export const useDBStore = defineStore('database', () => {
     await conn.open();
     db = conn;
 
-    await db.execute(`
-      CREATE TABLE IF NOT EXISTS ingredientes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        tipo TEXT NOT NULL,
-        rareza TEXT NOT NULL,
-        descripcion TEXT,
-        imagen TEXT
-      )
-    `);
+    await db.execute(`CREATE TABLE IF NOT EXISTS ingredientes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT NOT NULL,
+      tipo TEXT NOT NULL,
+      rareza TEXT NOT NULL,
+      descripcion TEXT,
+      imagen TEXT
+    )`);
+
+    await db.execute(`CREATE TABLE IF NOT EXISTS recetas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      texto TEXT NOT NULL
+    )`);
+
+    await db.execute(`CREATE TABLE IF NOT EXISTS ingrediente_receta (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      receta_id INTEGER NOT NULL,
+      ingrediente_id INTEGER NOT NULL,
+      FOREIGN KEY (receta_id) REFERENCES recetas(id),
+      FOREIGN KEY (ingrediente_id) REFERENCES ingredientes(id)
+    )`);
 
     return db;
   };

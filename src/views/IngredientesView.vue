@@ -9,19 +9,19 @@
       <!-- =================== Contenido ===================  -->
       <ion-content>
 
-        <ion-grid :class="'bg-[#075985] dark:bg-[#0f172a] h-[85vh]'">
+        <ion-grid :class="'bg-[#075985] dark:bg-[#140f2a h-[85vh]'">
           <!-- Añadir -->
-          <ion-row >
+          <ion-row>
             <ion-button expand="full" shape="round" fill="solid"  @click="agregarNuevo" class="w-full mt-4 text-white ion-margin-bottom ion">
               <ion-icon  :ios="cubeOutline" :md="cubeOutline" class="mr-2"></ion-icon> Agregar Ingrediente
             </ion-button>
           </ion-row>
 
-          <ion-row class="flex flex-col justify-center items-center space-y-6 mx-4">
+          <ion-row class="flex flex-col items-center justify-center mx-4 space-y-6">
   
             <!-- Total de ingredientes -->
-            <ion-col class="text-center text-white font-bold text-sm w-full">
-              Total: {{ totalIngredientes }} ingrediente{{ totalIngredientes === 1 ? '' : 's' }}
+            <ion-col class="w-full text-sm font-bold text-center text-white">
+              Total: {{ totalIngredientes }} ingrediente{{ totalIngredientes == 1 ? '' : 's' }}
             </ion-col>
 
             <!-- Input de búsqueda -->
@@ -30,7 +30,7 @@
                 v-model="busqueda"
                 fill="outline"
                 placeholder="Buscar ingrediente..."
-                class="rounded-xl border-2 border-sky-600 py-1"
+                class="py-1 border-2 rounded-xl border-sky-600"
               ></ion-input>
             </ion-col>
 
@@ -39,22 +39,21 @@
           <!-- Lista de ingredientes -->
           <div class="flex items-center justify-center mt-16">
             <Swiper
-            :modules="[EffectCoverflow, Pagination]"
-            effect="coverflow"
-            :grabCursor="true"
-            :centeredSlides="true"
-            :slidesPerView="1.2"
-            :loop="true"
-            :coverflowEffect="{
-              rotate: 30,
-              stretch: 0,
-              depth: 100,
-              modifier: 1,
-              slideShadows: true
-            }"
-
-            class="w-full"
-          >
+              class="w-full"
+              effect="coverflow"
+              :modules="[EffectCoverflow, Pagination]"
+              :grabCursor="true"
+              :centeredSlides="true"
+              :slidesPerView="1.2"
+              :loop="true"
+              :coverflowEffect="{
+                rotate: 30,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true
+              }"
+            >
               <SwiperSlide v-for="item in ingredientesFiltrados" 
                 :key="item.id"
                 :class="[
