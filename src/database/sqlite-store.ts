@@ -39,13 +39,14 @@ export const useDBStore = defineStore('database', () => {
 
     await db.execute(`CREATE TABLE IF NOT EXISTS recetas (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      texto TEXT NOT NULL
+      nombre TEXT NOT NULL
     )`);
 
     await db.execute(`CREATE TABLE IF NOT EXISTS ingrediente_receta (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       receta_id INTEGER NOT NULL,
       ingrediente_id INTEGER NOT NULL,
+      cantidad INTEGER NOT NULL,
       FOREIGN KEY (receta_id) REFERENCES recetas(id),
       FOREIGN KEY (ingrediente_id) REFERENCES ingredientes(id)
     )`);

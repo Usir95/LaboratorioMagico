@@ -109,9 +109,46 @@
 
           <ion-row class="form">
             <ion-col>
+
               <ion-row class="mb-4">
                 <ion-input v-model="form.nombre" label="Nombre de la receta" label-placement="floating" fill="outline" class="rounded-lg"></ion-input>
               </ion-row>
+
+              <ion-row class="mb-4">
+                
+                <div v-for="(ingrediente, index) in form.ingredientes" :key="index">
+                  <ion-row>
+
+                    <ion-col>
+                      <ion-select v-model="form.ingredientes[index].ingrediente" label="Ingrediente" label-placement="floating" fill="outline" class="w-full rounded-lg">
+                        <ion-select-option v-for="item in ListaIngredientes" :key="item.id" :value="item.id">{{ item.nombre }}</ion-select-option>
+                      </ion-select>
+                    </ion-col>
+
+                    <ion-col>
+                      <ion-input v-model="form.ingredientes[index].cantidad" type="number" label="Cantidad" label-placement="floating" fill="outline" class="rounded-lg"></ion-input>
+                    </ion-col>
+
+                    <ion-col size="auto" class="ion-align-self-center">
+                      <ion-button fill="clear" @click="QuitarIngrediente(index)" color="danger">
+                        <ion-icon :icon="trashOutline"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+
+                  </ion-row>
+                </div>
+
+                <div class="w-full ">
+                  <ion-row>
+                    <ion-col>
+                      <ion-button expand="block" @click="AgregarIngrediente()" size="small" fill="outline" color="success">
+                        Agregar Ingrediente
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </div>
+              </ion-row>
+              
             </ion-col>
           </ion-row>
 
@@ -125,6 +162,7 @@
         </ion-grid>
       </ion-content>
     </ion-modal>
+
   </ion-page>
 </template>
 
@@ -142,6 +180,7 @@ import {
   IonContent,
   IonModal,
   IonInput,
+  IonSelect, IonSelectOption,
   IonButtons,
   IonCard, IonCardContent, IonCardHeader, IonCardTitle,
   IonGrid, IonRow, IonCol,
@@ -154,6 +193,11 @@ import {
   EliminarReceta,
 } from '../database/Services/RecetaService';
 
+import {
+  ObtenerIngredientes,
+} from '../database/Services/IngredientesService';
+
+
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -163,22 +207,32 @@ import { EffectCoverflow, Pagination } from 'swiper/modules';
 
 /* =================== Variables =================== */
 const Recetas = ref([]);
+const ListaIngredientes = ref([]);
 const showModal = ref(false);
 const Busqueda = ref('');
 
 const form = ref({
   id: null,
   nombre: '',
+  ingredientes: [{
+    ingrediente: null,
+    cantidad: 1
+  }]
 });
 
 /* =================== Mounted =================== */
 onMounted(() => {
   CargarRecetas();
+  CargarIngredientes();
 });
 
 /* =================== Funciones =================== */
 const CargarRecetas = async () => {
   Recetas.value = await ObtenerRecetas();
+};
+
+const CargarIngredientes = async () => {
+  ListaIngredientes.value = await ObtenerIngredientes();
 };
 
 const Agregar = () => {
@@ -198,6 +252,8 @@ const CerrarModal = () => {
 };
 
 const Guardar = async () => {
+  console.log(form.value);
+  
   if (!form.value.nombre) {
     alert('Todos los campos son obligatorios');
     return;
@@ -208,7 +264,7 @@ const Guardar = async () => {
   } else {
     await InsertarRecetas(form.value);
     setTimeout(() => {
-      ultimoAgregadoId.value = null;
+      alert('Receta guardada correctamente');
     }, 2000);
   }
 
@@ -224,13 +280,23 @@ const Editar = (item) => {
   showModal.value = true;
 };
 
-
 const Eliminar = async (id) => {
   const confirmar = confirm('¿Estás seguro de que quieres eliminar este ingrediente?');
   if (!confirmar) return;
 
   await EliminarReceta(id);
   await CargarRecetas();
+};
+
+const AgregarIngrediente = () => {
+  form.value.ingredientes.push({
+    ingrediente: null,
+    cantidad: 1
+  });
+};
+
+const QuitarIngrediente = (index) => {
+  form.value.ingredientes.splice(index, 1);
 };
 
 /* =================== Computed =================== */

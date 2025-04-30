@@ -36,7 +36,6 @@ export const InsertarIngredientes = async (ingrediente) => {
     );
 };
 
-
 export const ActualizarIngredientes = async (ingrediente) => {
     const dbStore = useDBStore();
     const db = await dbStore.initDB();

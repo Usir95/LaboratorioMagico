@@ -18,17 +18,25 @@ export const ObtenerRecetas = async () => {
 };
 
 export const InsertarRecetas = async (data) => {
-    const dbStore = useDBStore();
-    const db = await dbStore.initDB();
+    try {
+        const dbStore = useDBStore();
+        const db = await dbStore.initDB();
+        
+        await db.run(`INSERT INTO recetas (nombre) VALUES (?)`, [data.nombre]);
+        // const recetaId = result.lastInsertRowid; 
 
-    await db.run(
-        `INSERT INTO recetas (nombre, tipo, rareza, descripcion, imagen) VALUES (?, ?, ?, ?, ?)`,
-        [
-            data.nombre,
-        ]
-    );
+        // for (const item of data.ingredientes) {
+        //     await db.run(
+        //         `INSERT INTO ingrediente_receta (receta_id, ingrediente_id, cantidad) VALUES (?, ?, ?)`, 
+        //         [recetaId, item.ingrediente, item.cantidad]
+        //     );
+        // }
+        return { success: true };
+    } catch (error) {
+        console.error('Error al insertar receta:', error);
+        return { success: false, error };
+    }
 };
-
 
 export const ActualizarRecetas = async (receta) => {
     const dbStore = useDBStore();
