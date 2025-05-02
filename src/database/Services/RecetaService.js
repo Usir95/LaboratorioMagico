@@ -13,8 +13,22 @@ import { useDBStore } from '@/database/sqlite-store';
 export const ObtenerRecetas = async () => {
     const dbStore = useDBStore();
     const db = await dbStore.initDB();
-    const res = await db.query("SELECT * FROM recetas ORDER BY nombre ASC");
-    return res.values || [];
+
+    const recetaRes = await db.query("SELECT * FROM recetas ORDER BY nombre ASC");
+    const recetas = recetaRes.values || [];
+
+    for (const receta of recetas) {
+        const ingredientesRes = await db.query(`SELECT ir.ingrediente_id as id, i.nombre, ir.cantidad
+            FROM ingrediente_receta ir
+            JOIN ingredientes i ON i.id = ir.ingrediente_id
+            WHERE ir.receta_id = ?`,
+            [receta.id]
+        );
+
+        receta.ingredientes = ingredientesRes.values || [];
+    }
+
+    return recetas;
 };
 
 export const InsertarRecetas = async (data) => {

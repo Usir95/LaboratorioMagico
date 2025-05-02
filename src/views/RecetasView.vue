@@ -60,9 +60,14 @@
                     </ion-card-header>
 
                     <ion-card-content class="text-center text-gray-700 dark:text-gray-300">
-                      Ingredientes: (por ahora solo el nombre de la receta)<br />
-                      (Luego aquí pondremos ingredientes combinados)
+                      <div class="mb-2 font-semibold">Ingredientes:</div>
+                      <ul class="space-y-1 text-sm">
+                        <li v-for="ing in item.ingredientes" :key="ing.id">
+                          🧪 {{ ing.nombre }} <span class="text-xs text-gray-500">(x{{ ing.cantidad }})</span>
+                        </li>
+                      </ul>
                     </ion-card-content>
+
 
                     <ion-row class="w-full ion-text-center ion-no-padding bg-slate-200">
                       <ion-grid>
@@ -302,10 +307,17 @@ const QuitarIngrediente = (index) => {
 /* =================== Computed =================== */
 const RecetasFiltrados = computed(() => {
   if (!Busqueda.value) return Recetas.value;
-  return Recetas.value.filter(item =>
-    item.nombre.toLowerCase().includes(Busqueda.value.toLowerCase())
-  );
+
+  const query = Busqueda.value.toLowerCase();
+  return Recetas.value.filter(item => {
+    const nombreCoincide = item.nombre.toLowerCase().includes(query);
+    const ingredientesCoinciden = item.ingredientes?.some(ing =>
+      ing.nombre.toLowerCase().includes(query)
+    );
+    return nombreCoincide || ingredientesCoinciden;
+  });
 });
+
 
 
 const Total = computed(() => RecetasFiltrados.value.length);
