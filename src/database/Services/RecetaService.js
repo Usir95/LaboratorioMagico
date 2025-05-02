@@ -21,17 +21,18 @@ export const InsertarRecetas = async (data) => {
     try {
         const dbStore = useDBStore();
         const db = await dbStore.initDB();
-        
-        await db.run(`INSERT INTO recetas (nombre) VALUES (?)`, [data.nombre]);
-        // const recetaId = result.lastInsertRowid; 
 
-        // for (const item of data.ingredientes) {
-        //     await db.run(
-        //         `INSERT INTO ingrediente_receta (receta_id, ingrediente_id, cantidad) VALUES (?, ?, ?)`, 
-        //         [recetaId, item.ingrediente, item.cantidad]
-        //     );
-        // }
+        const result = await db.run(`INSERT INTO recetas (nombre) VALUES (?)`, [data.nombre]);
+        const recetaId = result.lastInsertRowid;
+
+        for (const item of data.ingredientes) {
+            await db.run(`INSERT INTO ingrediente_receta (receta_id, ingrediente_id, cantidad) VALUES (?, ?, ?)`,
+                [recetaId, item.ingrediente, item.cantidad]
+            );
+        }
+
         return { success: true };
+
     } catch (error) {
         console.error('Error al insertar receta:', error);
         return { success: false, error };
